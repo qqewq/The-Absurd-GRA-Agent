@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Абсурдный GRA-Агент</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 50px auto; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        .absurd { color: darkorange; }
+    </style>
+</head>
+<body>
+    <h1>Диалог с Абсурдным ИИ</h1>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Ваше сообщение..." style="width:80%">
+    <button onclick="sendMessage()">Отправить</button>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value;
+            if (!text) return;
+            appendMessage('Вы', text);
+            input.value = '';
+            const resp = await fetch('http://127.0.0.1:5000/query', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: text})
+            });
+            const data = await resp.json();
+            const cls = data.absurd_zone ? 'absurd' : '';
+            appendMessage('ИИ', data.response, cls);
+        }
+        function appendMessage(sender, text, cls='') {
+            const chat = document.getElementById('chat');
+            chat.innerHTML += `<p class="${cls}"><b>${sender}:</b> ${text}</p>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
